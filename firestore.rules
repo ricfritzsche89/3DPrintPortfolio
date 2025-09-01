@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Hilfsfunktion, um den Admin anhand seiner E-Mail zu identifizieren.
+    // Dies ist sicherer als nur zu prüfen, ob der Nutzer nicht anonym ist.
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'ric89@druckkatalog.app';
+    }
+
+    // Regeln für die 'eintraege'-Collection
+    match /eintraege/{eintragId} {
+      // Jeder darf Einträge lesen.
+      allow read: if true;
+
+      // Nur der Admin darf Einträge erstellen, bearbeiten oder löschen.
+      allow create, update, delete: if isAdmin();
+
+      // Regeln für die 'kommentare'-Subcollection
+      match /kommentare/{kommentarId} {
+        allow read: if true;
+
+        // Ein authentifizierter Nutzer kann einen Kommentar erstellen, wenn die userId übereinstimmt.
+        allow create: if request.auth != null
+                      && request.resource.data.userId == request.auth.uid;
+
+        // Ein Nutzer kann nur seine eigenen Kommentare löschen.
+        allow delete: if request.auth != null
+                      && resource.data.userId == request.auth.uid;
+
+        // Das Bearbeiten von Kommentaren ist explizit verboten.
+        allow update: if false;
+      }
+
+      // Regeln für die 'vormerkungen'-Subcollection
+      match /vormerkungen/{userId} {
+        allow read: if true;
+
+        // Ein Nutzer kann nur seinen eigenen Vormerkungs-Eintrag (dessen ID seine UID ist)
+        // erstellen oder löschen.
+        allow create, delete: if request.auth != null && request.auth.uid == userId;
+
+        // Das Bearbeiten ist nicht vorgesehen.
+        allow update: if false;
+      }
+    }
+  }
+}

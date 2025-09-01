@@ -1,0 +1,44 @@
+name: ddd_druck_katalog
+description: A 3D printing catalog app with a light shop function.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.14.0
+  firebase_storage: ^11.6.0
+
+  # State Management
+  provider: ^6.1.1
+
+  # Image Picker
+  image_picker: ^1.0.4
+
+  # For comparing objects
+  equatable: ^2.0.5
+
+  # UI/UX
+  cupertino_icons: ^1.0.2
+  intl: ^0.18.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  mockito: ^5.4.4
+  build_runner: ^2.4.7
+  network_image_mock: ^2.1.1
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true

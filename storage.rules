@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Dieselbe Admin-Identifizierungsfunktion wie in den Firestore-Regeln.
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'ric89@druckkatalog.app';
+    }
+
+    // Regeln für den 'images'-Ordner
+    match /images/{imageName} {
+      // Jeder darf Bilder lesen (URLs sind öffentlich).
+      allow read: if true;
+
+      // Nur der Admin darf Bilder schreiben (hochladen, ändern, löschen).
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -17,10 +17,10 @@ class VormerkButton extends StatelessWidget {
     if (userId == null) {
       // Zeige einen deaktivierten Button, wenn kein User (auch kein anonymer) da ist.
       // Sollte in unserer Implementierung nicht passieren.
-      return const ElevatedButton.icon(
+      return ElevatedButton.icon(
         onPressed: null,
-        icon: Icon(Icons.favorite_border),
-        label: Text('Vormerken'),
+        icon: const Icon(Icons.favorite_border),
+        label: const Text('Vormerken'),
       );
     }
 

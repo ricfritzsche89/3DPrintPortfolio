@@ -4,9 +4,19 @@ import 'services/auth_service.dart';
 import 'services/firebase_service.dart';
 import 'screens/auth_wrapper.dart';
 
+import 'widgets/error_boundary.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  
+  // Error Handler für nicht abgefangene Fehler
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    // Hier können wir Fehler an einen Logging-Service senden
+    print('Uncaught error: ${details.exception}');
+  };
+  
+  runApp(const ErrorBoundary(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

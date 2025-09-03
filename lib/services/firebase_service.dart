@@ -3,18 +3,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../models/eintrag.dart';
 import '../models/kommentar.dart';
-import '../models/vormerkung.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  
+  // Cache für Einträge
+  final Map<String, Eintrag> _eintragCache = {};
+  final Duration _cacheDuration = const Duration(minutes: 15);
 
   // --- Einträge ---
 
   // Stream aller Einträge für die Katalogansicht
   Stream<List<Eintrag>> getEintraege() {
-    return _firestore.collection('eintraege').orderBy('erstelltAm', descending: true).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => Eintrag.fromSnapshot(doc)).toList();
+    // Offline-Cache-Konfiguration für Firestore
+    _firestore.settings = const Settings(
+      persistenceEnabled: true, // Aktiviert Offline-Persistenz
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED, // Maximale Cache-Größe
+    );
+
+    return _firestore
+        .collection('eintraege')
+        .orderBy('erstelltAm', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      final eintraege = snapshot.docs.map((doc) {
+        final eintrag = Eintrag.fromSnapshot(doc);
+        // Aktualisiere den Cache
+        _eintragCache[eintrag.id] = eintrag;
+        return eintrag;
+      }).toList();
+      return eintraege;
     });
   }
 
